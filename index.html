@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+
+	<title>Amazon cafe</title>
+	
+	 <link rel="stylesheet" type="text/css" href="css/style.css">
+     <link rel="stylesheet" type="text/css" href="css/popup.css">
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	 <link href="https://fonts.googleapis.com/css?family=Athiti" rel="stylesheet"> 
+	 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+</head>
+<body>
+
+
+	<div id="app">
+		<div class="container">
+			<div class="box-logo">
+				<img src="images/logo.png">
+
+			</div><!-- box-logo -->
+
+			<div class="row">
+				<div class="order">                    
+					<button class="active1" v-if="!isShowingCart" @click="isShowingCart = true"><i class="fas fa-coffee"></i> My coffee</button>
+					<button class="active1" v-else @click="isShowingCart = false">สั่งเครื่องดื่ม</button>
+
+					
+				</div><!-- order -->
+
+			<div class="information">
+				<div class="text">
+					<p>กรุณากรอกข้อมูลเพื่อสั่งออเดอร์</p>
+				</div><!-- text -->
+				<div class="text-1">
+					<div class="set-left">
+						<div class="text-choose">
+							เลือกเบอร์โต๊ะ <br>เลือกจำนวนที่นั่ง <br> ระบุชื่อ
+						</div>
+					</div>
+					<div class="set-right">
+						<div class="set-sel">
+						<select id="text-sel1" v-model='tableNo'>
+							<option value="">เบอร์โต๊ะ</option> 
+							<option value="A1">โต๊ะ A1</option>
+							<option value="A2">โต๊ะ A2</option>
+                            <option value="A3">โต๊ะ A3</option>
+                            <option value="A4">โต๊ะ A4</option>
+                            <option value="A5">โต๊ะ A5</option>
+                            <option value="A6">โต๊ะ A6</option>
+                            <option value="A7">โต๊ะ A7</option>
+						</select>
+						
+						<select id="text-sel2" v-model='numberOfPeople'>
+                            <option value="1">จำนวน</option>
+							<option value="น้อยกว่า 2 ท่าน">น้อยกว่า 2 ท่าน</option>
+							<option value="3-4 ท่าน">3-4 ท่าน</option>
+							<option value="5-9 ท่าน">5-9 ท่าน</option>
+                            <option value="มากกว่า 10 ท่าน">มากกว่า 10 ท่าน</option>
+						</select>
+
+						</div>                       
+						<div class="input-name">
+						<input type="text" id="txt" name="name" placeholder="กรุณากรอกชื่อ" onclick="this.value = '' ">
+                         <button class="submitbt" onclick="getAndSetVal();"><i class="fas fa-check"></i></button>
+                    </div>
+                        
+					</div>
+				</div>
+			</div><!-- bg-information -->
+			</div>
+
+			<div class="row">
+				<div class="card-number">
+                    
+                    
+                    
+                        <span>
+                                {{cart.items.length}} <span>รายการ</span>
+                               <br> {{cartTotal | currency}}
+                            </span>
+                        </div>
+			</div>
+
+
+			<div class="row" v-if="!isShowingCart">
+				<div class="col-md-4 mt-2" v-for="product in products">
+                    <div class="card"> 
+                      <img class="card-img-top" v-bind:src="product.img">
+                      <div class="card-body">
+                        <h5 class="card-title"> {{product.name}} </h5>
+                        <p class="card-text"> {{product.description}} </p>
+                            
+                        <div class="d-flex justify-content-between">
+                            <div class="card-price">
+                            <b>price : {{product.price}}</b></div>
+                            <div class="set-btn">
+                            <button class="busket" @click="addProductToCart(product)" :disabled="product.inStock == 0"><i class="fas fa-coffee"></i>  เพิ่มลงออเดอร์</button></div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                
+			</div>
+
+		<div class="row" v-else >
+                <div class="col-md-12" >
+                <h1>เช็คสินค้าของท่าน</h1>
+                <img id="line1" src="images/products-line.png">
+                <table class="table" v-if="cart.items.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th width="200">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="item in cart.items">
+                            <td id="setname"> {{item.product.name}}</td>
+                            <td id="setqu">
+                                <button class="btnplus" :disabled="item.product.inStock == 0" @click="increaseQty(item)" >+</button>
+                                <span>  {{item.quantity}} </span>
+                                <button class="btndel" @click="decreaseQty(item)">-</button>
+                            </td>
+                            <td> {{item.quantity * item.product.price | currency}} </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-right" colspan="2">
+                                <strong>Subtotal</strong>
+                            </td>
+
+                            <td> {{cartTotal | currency}} </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-right" colspan="2">
+                                <strong>Taxes</strong>
+                            </td>
+
+                            <td> {{taxAmount | currency}}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-right" colspan="2">
+                                <strong>Grand total</strong>
+                            </td>
+
+                            <td>{{grandTotal | currency}}</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2"></td>
+                            <td><button class="btncheck" onclick="document.getElementById('id01').style.display='block'" style="width:auto;">เช็คบิล</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p v-else>ยังไม่มีรายการที่สั่ง</p>
+                </div>
+            </div>
+            </div>	
+            <div id="id01" class="modal">
+                <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+                 <form class="modal-content" action="/action_page.php">
+    <div class="container2">
+
+    <div class="bg-1">  
+        <img class="logo" src="images/logo.png">
+    </div>
+        <p class="name-text">           
+            <span>
+               <input type="text" id="txt2" name="txt" onclick="this.value = '' "/>
+            </span>             
+        </p>
+        <p class="date">วันที่ : {{dateOfslip()}}</p>
+        <p class="time">เวลา : {{timeOfslip()}}</p> 
+        <p class="member">จำนวนที่นั่ง : {{numberOfPeople}} </p>
+        <p class="table">โต๊ะที่ : {{tableNo}}
+        <h2 class="head-2">รายการ</h2>
+        <p class="number" v-for="item in cart.items">จำนวนสินค้า : {{cart.items.length}}</p>
+        
+        <p class="name-product">ชื่อสินค้า</p>
+        <p class="price"> </p>
+        <p class="product" v-for="item in cart.items"> {{item.product.name}} </p>
+        <p class="vat"> VAT เพิ่ม 7% {{taxAmount | currency}} </p>
+        <h2 class="head-3">ภาษีมูลค่าเพิ่ม</h2>
+        <p class="total"> ยอดรวม {{grandTotal | currency}}</p>
+        <p class="thank">ขอบคุณที่ใช้บริการค่ะ</p>     
+
+     
+    </div>
+  </form>
+</div>	
+
+	</div><!-- app -->  
+
+    <footer>
+        <div class="ftt">            
+            <img id="logoft" src="images/logo.png">
+            <div class="iconft">
+                <a href="https://www.facebook.com/cafeamazonofficial/">
+                <i class="fab fa-facebook-square">&nbsp;&nbsp;</i></a>
+                <a href="http://www.cafe-amazon.com/index.aspx">
+                <i class="fas fa-globe">&nbsp;&nbsp;</i></a>
+
+                <i class="fas fa-phone-square"> &nbsp;1365</i>
+            </div>
+        </div>
+    </footer>
+
+     <script src="js/vue.min.js"></script>
+     <script src="js/app.js"></script>
+     <script>
+            
+            function getAndSetVal()
+            {
+                var txt1 = document.getElementById('txt').value;
+                document.getElementById('txt2').value = txt1;
+            }
+            function getVal()
+            {
+             var txt = document.getElementById('txt').value;
+             alert(txt);
+            }
+            
+    </script>
+    
+    <script >
+    var modal = document.getElementById('id01');
+    window.onclick = function(event) {
+        if (event.target == modal) {
+         modal.style.display = "none";
+        }
+    }
+    </script>
+        
+
+</body>
+</html>
